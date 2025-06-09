@@ -73,6 +73,7 @@ fn msg_vec_to_mat(msg_vec: &mut Vec<usize>, no_of_cols: u64) -> Vec<Vec<usize>> 
         .collect()
 }
 
+/// Defining the matrix error variants.
 #[derive(Debug)]
 enum MatrixError {
     DimensionError(String),
@@ -88,28 +89,6 @@ impl From<String> for MatrixError {
     fn from(error: String) -> Self {
         MatrixError::DimensionError(error)
     }
-}
-
-/// PERFORMING MATRIX MULTIPLICATION. ROWS AND COLS ARE OF THE POWER OF 2.
-/// Number of cols in matrix A must be equal to number of rows for matrix B.
-fn matrix_mul_base(encoding_mat: Vec<Vec<isize>>, msg_mat: Vec<Vec<usize>>) -> Result<Vec<isize>, MatrixError> {
-    let a = encoding_mat.to_vec();
-    if (a.len() != msg_mat.len()) | (a[0].len() != msg_mat.len()) {
-        return Err(MatrixError::DimensionError("Matrices dimensions do not match".to_string()));
-    }
-    Ok(vec![
-        a[0][0]*(msg_mat[0][0] as isize) + a[0][1]*(msg_mat[1][0] as isize),
-        a[0][0]*(msg_mat[0][1] as isize) + a[0][1]*(msg_mat[1][1] as isize),
-        a[1][0]*(msg_mat[0][0] as isize) + a[1][1]*(msg_mat[1][0] as isize),
-        a[1][0]*(msg_mat[0][1] as isize) + a[1][1]*(msg_mat[1][1] as isize),
-    ])
-}
-
-/// SPLITTING THE MATRIX. CONSIDER WHEN ROWS AND COLS ARE OF THE POWER OF 2. FOR STRASSEN.
-fn splitter(matrix: Vec<Vec<usize>>) -> (Vec<usize>, Vec<usize>, Vec<usize>, Vec<usize>){
-    let n = matrix.len();
-    (matrix[n % n].to_vec(), matrix[(n % n) + 1].to_vec(),
-     matrix[(n % n) + 2].to_vec(), matrix[(n % n) + 3].to_vec())
 }
 
 /// DOING A MATRIX TRANSPOSE.
@@ -129,9 +108,11 @@ fn transpose(matrix: &mut Vec<usize>, n_cols: u64) -> Vec<usize> {
     matrix.to_vec()
 }
 
+/// PERFORMING MATRIX MULTIPLICATION.
+/// MATRICES ARE MULTIPLIED HERE IN THEIR VECTOR REPRESENTATION.
 pub fn matrix_mul(encoding_mat: Vec<usize>, msg_mat: Vec<usize>) -> Vec<usize> {
     let mut encoded_mat = Vec::with_capacity(msg_mat.len());
-    let no_of_cols = 1;
+    let no_of_cols = 8;
     let mut c = 0;
     for j in 0..(msg_mat.len()/no_of_cols)-1 {
         for i in 0..msg_mat.len() {
@@ -151,31 +132,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_matrix_split() {
-        let matrix_to_split = vec![
-            &[3 as usize, 1 as usize, 0 as usize, 2 as usize],
-            &[4 as usize, 8 as usize, 5 as usize, 9 as usize],
-            &[2 as usize, 1 as usize, 6 as usize, 7 as usize],
-            &[0 as usize, 9 as usize, 5 as usize, 2 as usize],
-        ];
-        //let (a, b, c, d) = splitter(matrix_to_split);
-        //let mat_mul = mul_matrix();
-        //println!("Matrices are {:?}, {:?}, {:?}, {:?}", a, b, c, d);
-    }
-
-    #[test]
     fn test_message_matrix() {
-        pub const TEST_MAT_A: [[isize; 2]; 2] = [
-            [-1, 0],
-            [2, 3],
-        ];
-        let TEST_MAT_B: Vec<&[usize]> = vec![
-            &[1, 1],
-            &[3, 2],
-        ];
         let encoding_mat = encoding_test_mat();
         let corresp = gen_correspondence(&DEFAULT_CORRESP);
-        let msg = "Toda".to_string();
+        let msg = "Today is my favourite day. Tommorow will be my awesome day too".to_string();
         let mut msg_numerals = message_numerals(msg, corresp);
         let mut msg_mat = message_vector(&mut msg_numerals);
         let mut dummy_encoder_mat = message_vector(&mut msg_numerals);
