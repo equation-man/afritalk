@@ -96,7 +96,7 @@ fn transpose(matrix: &mut Vec<usize>, n_cols: u64) -> Vec<usize> {
     let mut min_range_index = 1;
     let mut no_of_cols = n_cols;
     let mut row;
-    for l in 2..n_cols {
+    for l in 2..n_cols+1 {
         for k in 1..no_of_cols {
             row = min_range_index + k*(n_cols-1);
             matrix.swap(row.try_into().unwrap(), min_range_index.try_into().unwrap());
