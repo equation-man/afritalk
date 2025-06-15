@@ -65,6 +65,7 @@ pub fn message_vector(msg_numeric: &mut Vec<usize>) -> Vec<usize> {
 }
 
 /// Converting the message vector to matrix.
+/// no_of_cols is the number of columns to convert the message vector to.
 fn msg_vec_to_mat(msg_vec: &mut Vec<usize>, no_of_cols: u64) -> Vec<Vec<usize>> {
     // let matrix_row_elements = msg_vec.len() / 4; // Calc no of elements per row
     msg_vec.chunks(no_of_cols.try_into().unwrap())
@@ -92,19 +93,26 @@ impl From<String> for MatrixError {
 }
 
 /// DOING A MATRIX TRANSPOSE.
+/// n_cols is the number of cols for the matrix to be transposed.
+/// Transposes square matrices.
 fn transpose(matrix: &mut Vec<usize>, n_cols: u64) -> Vec<usize> {
     let mut min_range_index = 1;
     let mut no_of_cols = n_cols;
     let mut row;
-    for l in 2..n_cols+1 {
-        for k in 1..no_of_cols {
-            row = min_range_index + k*(n_cols-1);
+    // Transposing a square matrix.
+    for i in 2..n_cols+1 {
+        for j in 1..no_of_cols {
+            row = min_range_index + j*(n_cols-1);
             matrix.swap(row.try_into().unwrap(), min_range_index.try_into().unwrap());
             min_range_index += 1;
         }
-        min_range_index += l;
+        min_range_index += i;
         no_of_cols -= 1;
     }
+    // Transposing horizontal rectangular matrix.
+    for k in 1..no_of_cols {
+    }
+
     matrix.to_vec()
 }
 
@@ -135,19 +143,17 @@ mod tests {
     fn test_message_matrix() {
         let encoding_mat = encoding_test_mat();
         let corresp = gen_correspondence(&DEFAULT_CORRESP);
-        let msg = "Today is my favourite day. Tommorow will be my awesome day too".to_string();
+        let msg = "Today is my favourite day. Tommorow will be another great day.".to_string();
         let mut msg_numerals = message_numerals(msg, corresp);
         let mut msg_mat = message_vector(&mut msg_numerals);
         let mut dummy_encoder_mat = message_vector(&mut msg_numerals);
+        //println!("The msg char numbers are {}", msg_mat.len());
         transpose(&mut msg_mat, 8);
         let msg_to_vec = msg_vec_to_mat(&mut msg_mat, 8);
-        //println!("{}, {}, {} are powers of 2", 2u64.count_ones(), 4u64.count_ones(), 8u8.count_ones());
-        println!("The message matrix is {:?}\n", msg_vec_to_mat(&mut dummy_encoder_mat, 8));
-        println!("The transpose message matrix is len of msg mat is {}, {:?}\n",msg_to_vec.len(), msg_to_vec);
+        //println!("The message matrix is {:?}\n", msg_vec_to_mat(&mut dummy_encoder_mat, 8));
+        //println!("The transpose message matrix is len of msg mat is {}, {:?}\n",msg_to_vec.len(), msg_to_vec);
         let mut mat_mul = matrix_mul(dummy_encoder_mat, msg_mat);
-        println!("The matrix multiplication is the len is {} {:?}", mat_mul.len(), msg_vec_to_mat(&mut mat_mul, 8));
-        //let mat_mul = matrix_mul_base(&TEST_MAT_A, TEST_MAT_B).unwrap();
-        //println!("The mat mul is {:?}", mat_mul);
+        //println!("The matrix multiplication is the len is {} {:?}", mat_mul.len(), msg_vec_to_mat(&mut mat_mul, 8));
     }
 
     #[test]
