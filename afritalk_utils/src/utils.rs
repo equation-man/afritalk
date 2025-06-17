@@ -36,12 +36,12 @@ pub fn gen_correspondence(tokens: &[char]) -> BTreeMap<usize, char> {
 }
 
 /// Generating the numerical equivalence of the message.
-pub fn message_numerals(msg: String, map: BTreeMap<usize, char>) -> Vec<usize> {
+pub fn message_numerals(msg: String, corresp_map: &BTreeMap<usize, char>) -> Vec<usize> {
     let msg_chars: Vec<char> = msg.chars().collect();
     // CREATING THE NUMERICAL VERSION OF THE MESSAGE(MESSAGE VECTOR).
     msg_chars.iter()
         .filter_map(|value| {
-            let k_v: Vec<(usize, char)> = map.iter()
+            let k_v: Vec<(usize, char)> = corresp_map.iter()
                 .filter_map(|(key, &val)| if val == *value { return Some((*key, val)); } else { return None; })
                 .collect();
             if k_v[0].1 == *value {
@@ -50,6 +50,21 @@ pub fn message_numerals(msg: String, map: BTreeMap<usize, char>) -> Vec<usize> {
                 return None;
             }
         }).collect::<Vec<usize>>()
+}
+
+/// Gerating text message from message matrix/vector.
+pub fn message_mat_to_chars(msg_vec: &Vec<usize>, corresp_map: BTreeMap<usize, char>) -> String {
+    msg_vec.iter()
+        .filter_map(|value| {
+            let k_v: Vec<(usize, char)> = corresp_map.iter()
+                .filter_map(|(key, &val)| if *key == *value { return Some((*key, val)); } else { return None; })
+                .collect();
+            if k_v[0].0 == *value {
+                return Some(k_v[0].1);
+            } else {
+                return None;
+            }
+        }).collect::<String>()
 }
 
 /// Building nxn matrix of the message vector.
@@ -66,7 +81,7 @@ pub fn message_vector(msg_numeric: &mut Vec<usize>) -> Vec<usize> {
 
 /// Converting the message vector to matrix.
 /// no_of_cols is the number of columns to convert the message vector to.
-fn msg_vec_to_mat(msg_vec: &mut Vec<usize>, no_of_cols: u64) -> Vec<Vec<usize>> {
+pub fn msg_vec_to_mat(msg_vec: &mut Vec<usize>, no_of_cols: u64) -> Vec<Vec<usize>> {
     // let matrix_row_elements = msg_vec.len() / 4; // Calc no of elements per row
     msg_vec.chunks(no_of_cols.try_into().unwrap())
         .collect::<Vec<&[usize]>>()
@@ -95,7 +110,7 @@ impl From<String> for MatrixError {
 /// DOING A MATRIX TRANSPOSE.
 /// n_cols is the number of cols for the matrix to be transposed.
 /// Transposes square matrices.
-fn transpose(matrix: &mut Vec<usize>, n_cols: u64) -> Vec<usize> {
+pub fn transpose(matrix: &mut Vec<usize>, n_cols: u64) -> Vec<usize> {
     let mut min_range_index = 1;
     let mut no_of_cols = n_cols;
     let mut row;
@@ -144,8 +159,10 @@ mod tests {
         let encoding_mat = encoding_test_mat();
         let corresp = gen_correspondence(&DEFAULT_CORRESP);
         let msg = "Today is my favourite day. Tommorow will be another great day.".to_string();
-        let mut msg_numerals = message_numerals(msg, corresp);
+        let mut msg_numerals = message_numerals(msg, &corresp);
         let mut msg_mat = message_vector(&mut msg_numerals);
+        let msg_mat_to_char = message_mat_to_chars(&msg_mat, corresp);
+        println!("The message matrix converted to chars is {:?}", msg_mat_to_char);
         let mut dummy_encoder_mat = message_vector(&mut msg_numerals);
         //println!("The msg char numbers are {}", msg_mat.len());
         transpose(&mut msg_mat, 8);
