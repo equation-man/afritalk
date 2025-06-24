@@ -40,6 +40,6 @@ MA=B
 Here, the receiver receives the encrypted message B, and knows the inverse of A (the secret in this case). Decoding will be straightforward computation, where we premultiply B by inverse of A to get back to our original message M.   
 We have,
 ```
-BA<sup>-1</sup>=M
+BA^-1=M
 ``` 
 With numerical equivalent of our message, we can generate back the text based representation of our message using the natural rule of correspondece.
