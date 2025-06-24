@@ -27,7 +27,10 @@ We choose an encoding matrix A such that;
 - A has only integer entries.  
 - Inverse of A has only integer entries.  
 - A is not very large for easy computation of its inverse.   
+
+
 Sender will encode the message by means of this non-singular matrix A, by premultiplying the message matrix(i.e M) by matrix A, to obtain the encoded version of the message(i.e B).   
+
 *Here, our message matrix M has gone through a particular transformation A to arrive at its encoded form B i.e*
 ```
 MA=B
@@ -37,6 +40,6 @@ MA=B
 Here, the receiver receives the encrypted message B, and knows the inverse of A (the secret in this case). Decoding will be straightforward computation, where we premultiply B by inverse of A to get back to our original message M.   
 We have,
 ```
-BA<sup>-1<sup>=M
+BA<sup>-1</sup>=M
 ``` 
 With numerical equivalent of our message, we can generate back the text based representation of our message using the natural rule of correspondece.
