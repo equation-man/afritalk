@@ -126,8 +126,8 @@ pub fn transpose(matrix: &mut Vec<usize>, n_cols: u64) -> Vec<usize> {
     }
     // Transposing horizontal rectangular matrix.
     for k in 1..no_of_cols {
+        todo!();
     }
-
     matrix.to_vec()
 }
 
